@@ -5,8 +5,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Image from "next/image";
 import { LOCATIONS } from "./common/locations";
-mapboxgl.accessToken =
-  "pk.eyJ1IjoiZGNyZWJiaW4iLCJhIjoiY20wZzQwYndzMTBhbDJucTMzeDBxMWZpbSJ9.y42ThEhP-QmE7f5_ClUW6g";
+mapboxgl.accessToken ="pk.eyJ1IjoiZGNyZWJiaW4iLCJhIjoiY20xMjFtYnc0MHh4ZjJrb2h2NDR5MjF6YyJ9.LOAauCyTV_pfMAYd08pTmg";
 
 interface SearchResult {
   price: string;
