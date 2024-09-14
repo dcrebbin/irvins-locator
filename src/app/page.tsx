@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Image from "next/image";
+import { LOCATIONS } from "./common/locations";
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGNyZWJiaW4iLCJhIjoiY20wZzQwYndzMTBhbDJucTMzeDBxMWZpbSJ9.y42ThEhP-QmE7f5_ClUW6g";
 
@@ -17,10 +18,7 @@ export default function Home() {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const zoom = 3;
-
-
   const center = [103.98641487138919, 1.3559609211311883];
-
 
   function requestLocation() {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -39,10 +37,10 @@ export default function Home() {
       zoom: zoom,
     });
 
-    addPlace(103.98641487138919, 1.3559609211311883, {
-      price: "8 - 20 $SGD",
-      address: "65 Airport Blvd., Level 2 Terminal 3, Singapore 819663",
+    LOCATIONS.forEach((location) => {
+      addPlace(location.coordinates[0]!, location.coordinates[1]!, location);
     });
+
     requestLocation();
   }, []);
 
