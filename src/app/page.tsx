@@ -4,54 +4,29 @@ import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Image from "next/image";
-import LocationIcon from "./_components/icons/location";
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGNyZWJiaW4iLCJhIjoiY20wZzQwYndzMTBhbDJucTMzeDBxMWZpbSJ9.y42ThEhP-QmE7f5_ClUW6g";
 
 interface SearchResult {
-  price: number;
-  store: string;
-  url: string;
+  price: string;
   address: string;
-  description: string;
-  coordinates: {
-    latitude: number;
-    longitude: number;
-  };
 }
 
 export default function Home() {
+
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const lng = -70.9;
-  const lat = 42.35;
-  const zoom = 9;
-  const searchRef = useRef<HTMLInputElement | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [city, setCity] = useState<string | null>(null);
-  const [country, setCountry] = useState<string | null>(null);
-  const [query, setQuery] = useState<string | null>(null);
-  const [location, setLocation] = useState<{
-    latitude: number;
-    longitude: number;
-  } | null>(null);
+  const zoom = 3;
+
+
+  const center = [103.98641487138919, 1.3559609211311883];
+
 
   function requestLocation() {
     navigator.geolocation.getCurrentPosition((position) => {
       const { latitude, longitude } = position.coords;
       map.current?.setCenter([longitude, latitude]);
-      map.current?.setZoom(12);
-
-      setLocation({ latitude, longitude });
-      void fetch("/api/location/reverse", {
-        method: "POST",
-        body: JSON.stringify({ latitude, longitude }),
-      })
-        .then((response: Response) => response.json())
-        .then((data: { cityName: string; countryName: string }) => {
-          setCity(data.cityName);
-          setCountry(data.countryName);
-        });
+      map.current?.setZoom(9);
     });
   }
 
@@ -60,42 +35,74 @@ export default function Home() {
     map.current = new mapboxgl.Map({
       container: mapContainer.current!,
       style: "mapbox://styles/mapbox/streets-v11",
-      center: [lng, lat],
+      center: center as mapboxgl.LngLatLike,
       zoom: zoom,
     });
 
-    addPlace(lng, lat, {
-      price: 0,
-      store: "Irvins",
-      url: "https://irvins.com",
-      address: "123 Main St, Boston, MA 02118",
-      description: "Irvins is a bakery that sells cookies.",
-      coordinates: {
-        latitude: lat,
-        longitude: lng,
-      },
+    addPlace(103.98641487138919, 1.3559609211311883, {
+      price: "8 - 20 $SGD",
+      address: "65 Airport Blvd., Level 2 Terminal 3, Singapore 819663",
     });
     requestLocation();
-  }, [lng, lat]);
+  }, []);
 
   function addPlace(longitude: number, latitude: number, data: SearchResult) {
-    map.current?._addPopup(
-      new mapboxgl.Popup({
-        closeButton: false,
-        closeOnClick: false,
-        closeOnMove: false,
-      })
-        .setLngLat([longitude, latitude])
-        .setHTML(
-          `<div class="max-w-[200px] min-w-[150px] rounded-md bg-white p-2">
-            <h1 class="text-sm font-bold text-gray-800 truncate">${data.store}</h1>
-            <p class="text-xs font-semibold text-green-600">${data.price}</p>
-            <p class="text-xs text-gray-600 truncate">${data.address}</p>
-            <a href="${data.url}" target="_blank" class="mt-1 px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors block text-center">View</a>
-           </div>`,
-        )
-        .addTo(map.current),
-    );
+    const popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false,
+      closeOnMove: false,
+    });
+
+    const marker = new mapboxgl.Marker({
+      element: createCustomMarker(popup, data),
+      anchor: 'bottom'
+    })
+      .setLngLat([longitude, latitude])
+      .addTo(map.current!);
+
+    popup.setLngLat([longitude, latitude]);
+  }
+
+  function createCustomMarker(popup: mapboxgl.Popup, data: SearchResult) {
+    const markerElement = document.createElement('div');
+
+    const duck = document.createElement('img');
+    duck.src = '/images/duck.svg';
+    duck.alt = 'Duck';
+    duck.className = 'w-10 h-10 cursor-pointer mt-8 z-[1000]';
+    duck.onclick = () => {
+      const contentIsVisible = markerElement.classList.contains('visible');
+      if (contentIsVisible) {
+        popup.remove();
+        markerElement.classList.remove('visible');
+      } else {
+        popup.setDOMContent(createPopupContent(data));
+        popup.addTo(map.current!);
+        markerElement.classList.add('visible');
+      }
+    };
+    markerElement.style.marginTop = '40px';
+    markerElement.appendChild(duck);
+    return markerElement;
+  }
+
+  function createPopupContent(data: SearchResult) {
+    const container = document.createElement('div');
+    container.className = 'max-w-[150px] min-w-[100px] h-fit rounded-md bg-white p-2 flex flex-col items-center justify-center top-24';
+
+    const address = document.createElement('p');
+    address.className = 'text-xs text-gray-600 font-bold';
+    address.style.wordWrap = 'break-word';
+    address.style.maxWidth = '100%';
+    address.textContent = data.address;
+    container.appendChild(address);
+
+    const price = document.createElement('p');
+    price.className = 'text-xs font-semibold text-green-600';
+    price.textContent = data.price.toString();
+    container.appendChild(price);
+
+    return container;
   }
 
   return (
@@ -112,7 +119,7 @@ export default function Home() {
         </div>
       </div>
       <Image src="/images/crisps.png" width={100} height={100} alt="Irvins" className="z-[1000] fixed right-0 bottom-0 mx-20 mb-10" />
-      <div className="relative w-[100vw] flex h-fit bg-red-300 overflow-hidden">
+      <div className="relative w-[100vw] flex h-fit overflow-hidden">
 
         <div ref={mapContainer} className="map-container relative" />
         <style jsx>{`
