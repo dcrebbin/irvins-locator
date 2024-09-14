@@ -3,7 +3,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import Refresh from "./_components/icons/refresh";
+import Image from "next/image";
+import LocationIcon from "./_components/icons/location";
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGNyZWJiaW4iLCJhIjoiY20wZzQwYndzMTBhbDJucTMzeDBxMWZpbSJ9.y42ThEhP-QmE7f5_ClUW6g";
 
@@ -35,6 +36,25 @@ export default function Home() {
     longitude: number;
   } | null>(null);
 
+  function requestLocation() {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const { latitude, longitude } = position.coords;
+      map.current?.setCenter([longitude, latitude]);
+      map.current?.setZoom(12);
+
+      setLocation({ latitude, longitude });
+      void fetch("/api/location/reverse", {
+        method: "POST",
+        body: JSON.stringify({ latitude, longitude }),
+      })
+        .then((response: Response) => response.json())
+        .then((data: { cityName: string; countryName: string }) => {
+          setCity(data.cityName);
+          setCountry(data.countryName);
+        });
+    });
+  }
+
   useEffect(() => {
     if (map.current) return;
     map.current = new mapboxgl.Map({
@@ -55,23 +75,7 @@ export default function Home() {
         longitude: lng,
       },
     });
-
-    navigator.geolocation.getCurrentPosition((position) => {
-      const { latitude, longitude } = position.coords;
-      map.current?.setCenter([longitude, latitude]);
-      map.current?.setZoom(12);
-
-      setLocation({ latitude, longitude });
-      void fetch("/api/location/reverse", {
-        method: "POST",
-        body: JSON.stringify({ latitude, longitude }),
-      })
-        .then((response: Response) => response.json())
-        .then((data: { cityName: string; countryName: string }) => {
-          setCity(data.cityName);
-          setCountry(data.countryName);
-        });
-    });
+    requestLocation();
   }, [lng, lat]);
 
   function addPlace(longitude: number, latitude: number, data: SearchResult) {
@@ -95,16 +99,34 @@ export default function Home() {
   }
 
   return (
-    <div className="h-screen w-screen flex flex-col">
-      <div className="z-[1000] w-screen rounded-md bg-white p-4 text-black flex flex-col items-center justify-center text-center">
-        <h1 className="text-2xl font-bold text-center">Irvins Locator</h1>
+    <div className="h-screen w-screen flex flex-col overflow-hidden">
+      <div className="z-[1000] w-screen rounded-m  text-black flex flex-col items-center justify-center text-center">
+        <Image src="/images/top-bar.png" alt="Irvins" className="w-full h-auto object-fit" width={1920} height={30} />
+        <div className="flex items-center justify-center">
+          <h1 className="text-6xl text-center font-[Irvins] pb-4 flex items-center justify-center w-full leading-none">
+            Irvins Locator
+          </h1>
+          <button onClick={requestLocation} className="bg-black rounded-full p-3 mx-2">
+            <Image src="/images/location.png" alt="Location" width={24} height={24} />
+          </button>
+        </div>
       </div>
-      <div ref={mapContainer} className="map-container" />
-      <style jsx>{`
+      <Image src="/images/crisps.png" width={100} height={100} alt="Irvins" className="z-[1000] fixed right-0 bottom-0 mx-20 mb-10" />
+      <div className="relative w-[100vw] flex h-fit bg-red-300 overflow-hidden">
+
+        <div ref={mapContainer} className="map-container relative" />
+        <style jsx>{`
         .map-container {
-          height: 100vh;
-        }
-      `}</style>
+          height: 90vh;
+          width: 100vw;
+          }
+          `}</style>
+        <Image src="/images/side-1.png" alt="Irvins" className="w-full h-auto object-fit absolute bottom-0 z-[1000]" width={1920} height={20} />
+        <Image src="/images/side-3.png" alt="Irvins" className="w-auto h-full object-fit absolute right-0 bottom-0 z-[1000]" width={103} height={1000} />
+        <Image src="/images/side-3.png" alt="Irvins" className="w-auto h-screen object-fit absolute left-0 rotate-180 bottom-0 z-[1000]" width={103} height={1000} />
+        <Image src="/images/side-1.png" alt="Irvins" className="w-full -mt-2 h-auto object-fit absolute rotate-180 top-0 left-0 z-[1000]" width={1920} height={20} />
+      </div>
+
     </div>
   );
 }
