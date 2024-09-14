@@ -127,8 +127,8 @@ export default function Home() {
           }
           `}</style>
         <Image src="/images/side-1.png" alt="Irvins" className="w-full h-auto object-fit absolute bottom-0 z-[1000]" width={1920} height={20} />
-        <Image src="/images/side-3.png" alt="Irvins" className="w-auto h-full object-fit absolute right-0 bottom-0 z-[1000]" width={103} height={1000} />
-        <Image src="/images/side-3.png" alt="Irvins" className="w-auto h-screen object-fit absolute left-0 rotate-180 bottom-0 z-[1000]" width={103} height={1000} />
+        <Image src="/images/side-3.png" alt="Irvins" className="w-[25px] md:w-[40px] lg:w-[60px] xl:w-auto h-full object-fit absolute right-0 bottom-0 z-[1000]" width={103} height={1000} />
+        <Image src="/images/side-3.png" alt="Irvins" className="w-[25px] md:w-[40px] lg:w-[60px] xl:w-auto h-screen object-fit absolute left-0 rotate-180 bottom-0 z-[1000]" width={103} height={1000} />
         <Image src="/images/side-1.png" alt="Irvins" className="w-full -mt-2 h-auto object-fit absolute rotate-180 top-0 left-0 z-[1000]" width={1920} height={20} />
       </div>
 
