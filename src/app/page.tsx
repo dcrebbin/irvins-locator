@@ -105,15 +105,20 @@ export default function Home() {
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden">
-      <div className="z-[1000] w-screen rounded-m  text-black flex flex-col items-center justify-center text-center">
+      <div className="z-[1000] w-screen rounded-m text-black flex flex-col items-center justify-center text-center">
         <Image src="/images/top-bar.png" alt="Irvins" className="w-full h-auto object-fit" width={1920} height={30} />
-        <div className="flex items-center justify-center">
-          <h1 className="text-6xl text-center font-[Irvins] pb-4 flex items-center justify-center w-full leading-none">
-            Irvins Locator
-          </h1>
-          <button onClick={requestLocation} className="bg-black rounded-full p-3 mx-2">
-            <Image src="/images/location.png" alt="Location" width={24} height={24} />
-          </button>
+        <div className="flex flex-col sm:flex-row items-center justify-center">
+          <div className="flex items-center">
+            <h1 className="text-5xl sm:text-6xl text-center font-[Irvins] pb-2 sm:pb-4 flex items-center justify-center w-full leading-none">
+              Irvins Locator
+            </h1>
+            <button onClick={requestLocation} className="bg-black rounded-full w-10 h-10 mx-2 px-2">
+              <Image src="/images/location.png" alt="Location" width={20} height={20} className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+          </div>
+          <div className="flex items-center mt-2 sm:mt-0">
+            <a href="mailto:irvinslocator@gmail.com?subject=Irvins%20Locator%20Submission" className="mx-1 sm:mx-2 text-3xl sm:text-4xl mb-1 sm:mb-2 font-[Irvins] underline">Submit</a>
+          </div>
         </div>
       </div>
       <Image src="/images/crisps.png" width={100} height={100} alt="Irvins" className="z-[1000] fixed right-0 bottom-0 mx-20 mb-10" />
